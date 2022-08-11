@@ -9,5 +9,6 @@
 ### 4. python manage.py runserver
 
 
-![Page Screenshot](https://user-images.githubusercontent.com/58087115/184133104-77cbc9df-0dd1-4950-b84e-840cb1a7d4e5.png)
+![Page Screenshot](https://user-images.githubusercontent.com/58087115/184133344-8a8af972-b2b7-4f19-af0f-9daa76b85137.png)
+
 
