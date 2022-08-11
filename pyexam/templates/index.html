@@ -1,0 +1,173 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  
+    <link href="{% static 'index.css' %}" rel="stylesheet"> 
+    <script type="text/javascript" src="https://code.jquery.com/jquery-1.7.1.min.js"></script>
+    
+    <title>Python Coding Exam</title>
+</head>
+<body>
+
+    <div class='container'>
+        <h1>Employee Records</h1>
+
+        <br>
+        <p>All Records</p>
+        <div id='allEmp'> </div>
+
+        <br>
+        <br>
+        <p>Regular Employee Records</p>
+        <div id='regEmp'> </div>
+
+        <br>
+        <br>
+        <p>Number of Employee from Different Country</p>
+        <div id='countryEmp'> </div>
+
+        <br>
+        <br>
+        <p>Filter Employee</p>
+        <div id='dynamicFilter'>
+            <form method="post" id='filter'>
+                {% csrf_token %}
+                {{ forms.as_p }}
+
+                <button type="submit" class="btn btn-primary">Search</button>
+            </form>
+
+        </div>
+
+        <br>
+        <div id='filterResult'> </div>
+
+        
+    </div>
+    
+
+    <script>
+        // print records table
+        function printTable(json, divID) {
+            colName = Object.keys(json[0])
+            outputHTML = "<table style='margin: auto;'>"
+            outputHTML += "<tr>"
+            for (var i = 0; i < colName.length; i++) {
+                outputHTML += "<th>" + colName[i] + "</th>"
+                
+            }
+            outputHTML += "</tr>"
+
+            for (var i = 0; i < json.length; i++) {
+                // console.log(json[i])
+                
+                outputHTML += "<tr>"
+                outputHTML += "<td>" + json[i].emp_id + "</td>"
+                outputHTML += "<td>" + json[i].first_name + "</td>"
+                outputHTML += "<td>" + json[i].last_name + "</td>"
+                outputHTML += "<td>" + json[i].emp_status + "</td>"
+                outputHTML += "<td>" + json[i].country + "</td>"
+                outputHTML += "<td>" + json[i].dob + "</td>"
+                outputHTML += "</tr>"
+            }
+            outputHTML += "</table>"
+            document.getElementById(divID).innerHTML = outputHTML
+        }
+        
+        // make GET ajax call
+        // All records
+        jQuery(function($) {
+            $.ajax({
+                url: 'all-emp/',
+                type: 'GET',
+                success : function(json) {
+                    printTable(json, 'allEmp')
+                },
+                // handle a non-successful response
+                error : function(xhr,errmsg,err) {
+                    console.log('error');
+                }         
+            })
+        }, false);
+
+        // regular employee records
+        jQuery(function($) {
+            $.ajax({
+                url: 'regular-emp/',
+                type: 'GET',
+                success : function(json) {
+                    printTable(json, 'regEmp')
+                },
+                // handle a non-successful response
+                error : function(xhr,errmsg,err) {
+                    console.log('error');
+                }         
+            })
+        }, false);
+
+        // country count
+        jQuery(function($) {
+            $.ajax({
+                url: 'country-emp/',
+                type: 'GET',
+                success : function(json) {
+                    colName = Object.keys(json[0])
+                    outputHTML = "<table style='margin: auto;'>"
+                    outputHTML += "<tr>"
+                    for (var i = 0; i < colName.length; i++) {
+                        outputHTML += "<th>" + colName[i] + "</th>"
+                        
+                    }
+                    outputHTML += "</tr>"
+
+                    for (var i = 0; i < json.length; i++) {
+                        // console.log(json[i])
+                        
+                        outputHTML += "<tr>"
+                        outputHTML += "<td>" + json[i].country + "</td>"
+                        outputHTML += "<td>" + json[i].count + "</td>"
+                        outputHTML += "</tr>"
+                    }
+                    outputHTML += "</table>"
+                    document.getElementById('countryEmp').innerHTML = outputHTML
+                },
+                error : function(xhr,errmsg,err) {
+                    console.log('error');
+                }         
+            })
+        }, false);
+
+        // dynamically filter employee
+        $("#filter").submit(function (e) {
+            // prevent page from reload
+            e.preventDefault();
+            // serialize the data
+            var serializedData = $(this).serialize();
+
+            // make POST ajax call
+            $.ajax({
+                url: 'dynamic-filter/',
+                type: 'POST',
+                data: serializedData,
+                success : function(json) {
+                    if (json !='error') {
+                        printTable(json, 'filterResult')
+                    }
+                    else {
+                        document.getElementById('filterResult').innerHTML = "<p>Error</p>"
+                    }
+                },
+                error : function(responser) {
+                    console.log('error');
+                }         
+            })
+        })
+        
+    </script>
+
+</body>
+</html>
